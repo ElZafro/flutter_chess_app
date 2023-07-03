@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 
-import '../data/settings_data_provider.dart';
+import '../data/local_storage.dart';
 
 class Settings {
   var boardColor = BoardColor.brown;
@@ -9,7 +9,7 @@ class Settings {
 }
 
 class ChessPagePresenter {
-  final ChessDataProvider dataProvider;
+  final LocalStorage dataProvider;
   Settings settings = Settings();
 
   ChessPagePresenter(this.dataProvider) {

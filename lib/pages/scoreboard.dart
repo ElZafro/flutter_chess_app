@@ -1,8 +1,16 @@
-import 'package:final_project/data/database.dart';
 import 'package:flutter/material.dart';
 
-class ScoreboardPage extends StatelessWidget {
-  final _database = Database();
+import '../domain/scoreboard_interactor.dart';
+
+class ScoreboardPage extends StatefulWidget {
+  const ScoreboardPage({super.key});
+
+  @override
+  ScoreboardPageState createState() => ScoreboardPageState();
+}
+
+class ScoreboardPageState extends State<ScoreboardPage> {
+  final _scoreboardInteractor = ScoreboardInteractor();
 
   @override
   Widget build(BuildContext context) {
@@ -15,32 +23,50 @@ class ScoreboardPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Scoreboard',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            FutureBuilder<Map<String, int>>(
-              future: _database.readScoreboard(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text('Error loading scoreboard'));
-                } else {
-                  final scoreboardData = snapshot.data;
-                  return Column(
-                    children: scoreboardData!.entries.map((entry) {
-                      return _buildScoreboardRow(entry.key, entry.value);
-                    }).toList(),
-                  );
-                }
-              },
-            ),
+            _buildScoreboardContent(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScoreboardContent() {
+    return FutureBuilder<List<ScoreboardEntry>>(
+      future: _scoreboardInteractor.getScoreboard(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Center(child: Text('Error loading scoreboard'));
+        } else {
+          final scoreboardData = snapshot.data;
+          return Column(
+            children: [
+              Row(
+                children: [
+                  _buildColumnTitle('Email'),
+                  _buildColumnTitle('Games Played'),
+                ],
+              ),
+              const SizedBox(height: 16.0),
+              ...scoreboardData!.map((entry) {
+                return _buildScoreboardRow(entry.email, entry.games);
+              }).toList(),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildColumnTitle(title) {
+    return Expanded(
+      flex: 3,
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16.0,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -73,8 +99,4 @@ class ScoreboardPage extends StatelessWidget {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(home: ScoreboardPage()));
 }

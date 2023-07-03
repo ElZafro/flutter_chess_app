@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../data/settings_data_provider.dart';
+import '../data/local_storage.dart';
 import '../domain/settings_page_presenter.dart';
 
 class ChessPage extends StatefulWidget {
-  const ChessPage({super.key, required this.dataProvider});
+  const ChessPage({super.key, required this.chessboardSettings});
 
-  final ChessDataProvider dataProvider;
+  final LocalStorage chessboardSettings;
 
   @override
   ChessPageState createState() => ChessPageState();
@@ -21,9 +21,39 @@ class ChessPageState extends State<ChessPage> {
   @override
   void initState() {
     super.initState();
-    selectedOrientation = widget.dataProvider.getBoardOrientation();
-    selectedBackgroundColor = widget.dataProvider.getBoardColor();
-    presenter = ChessPagePresenter(widget.dataProvider);
+    selectedOrientation = widget.chessboardSettings.getBoardOrientation();
+    selectedBackgroundColor = widget.chessboardSettings.getBoardColor();
+    presenter = ChessPagePresenter(widget.chessboardSettings);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Chess Table Settings'),
+        ),
+        body: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'Choose Orientation',
+                style: TextStyle(fontSize: 20.0),
+              ),
+            ),
+            Column(children: _orientationOptions()),
+            const Divider(),
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'Choose Background Color',
+                style: TextStyle(fontSize: 20.0),
+              ),
+            ),
+            Column(children: _backgroundColorOptions()),
+          ],
+        ),
+        floatingActionButton: _saveAndReturnButton());
   }
 
   List<Widget> _orientationOptions() {
@@ -57,42 +87,12 @@ class ChessPageState extends State<ChessPage> {
   FloatingActionButton _saveAndReturnButton() {
     return FloatingActionButton(
       onPressed: () {
-        widget.dataProvider.setBoardOrientation(selectedOrientation);
-        widget.dataProvider.setBoardColor(selectedBackgroundColor);
+        widget.chessboardSettings.setBoardOrientation(selectedOrientation);
+        widget.chessboardSettings.setBoardColor(selectedBackgroundColor);
 
         Get.back();
       },
       child: const Icon(Icons.check),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Chess Table Settings'),
-        ),
-        body: Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Choose Orientation',
-                style: TextStyle(fontSize: 20.0),
-              ),
-            ),
-            Column(children: _orientationOptions()),
-            const Divider(),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Choose Background Color',
-                style: TextStyle(fontSize: 20.0),
-              ),
-            ),
-            Column(children: _backgroundColorOptions()),
-          ],
-        ),
-        floatingActionButton: _saveAndReturnButton());
   }
 }

@@ -1,9 +1,9 @@
 import 'package:get_storage/get_storage.dart';
 
-class ChessDataProvider {
+class LocalStorage {
   final GetStorage storage;
 
-  ChessDataProvider(this.storage) {
+  LocalStorage(this.storage) {
     storage.writeIfNull('board-color', 'brown');
     storage.writeIfNull('board-orientation', 'white');
   }
